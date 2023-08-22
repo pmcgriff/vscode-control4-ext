@@ -127,7 +127,7 @@ async function control4Import() {
             CommandsResource.Write(driver.commands),
             ProxiesResource.Write(driver.proxies),
             UIResource.Write(driver.UI),
-            NavDisplayOptionsResource.Write(driver.navdisplayoptions)
+            NavDisplayOptionsResource.Write(driver.capabilities.navigator_display_option)
           ])
 
           // Initialize vscode settings
@@ -135,6 +135,9 @@ async function control4Import() {
           await WriteIfNotExists(path.join(root, ".vscode", "tasks.json"), JSON.stringify(templateTasks, null, 2));
           await WriteIfNotExists(path.join(root, ".gitignore"), await ReadFileContents(path.join(this.extensionUri.fsPath, "client", "src", "resources", "templates", ".gitignore")));
           await WriteIfNotExists(path.join(root, ".npmrc"), "@annex4:registry=https://npm.pkg.github.com" );
+
+          // Remove navigator_display_option from capabilities so not copied to pkg
+          delete driver.capabilities.navigator_display_option;
 
           templatePackage.name = path.basename(c4z.path, ".c4z");
           templatePackage.control4.name = driver.name;

@@ -88,7 +88,6 @@ export class Driver {
     states: C4State[]
     tabs: C4Tab[]
     UI: C4UI[]
-    navdisplayoptions: C4NavDisplayOption[]
     capabilities: any
 
     serialsettings: string
@@ -134,7 +133,7 @@ export class Driver {
         this.UI = [];
         this.capabilities = {};
         this.states = [];
-        this.navdisplayoptions = [];
+        this.capabilities.navigator_display_option = [];
     }
 
     /**
@@ -146,7 +145,7 @@ export class Driver {
         this.properties = await PropertiesResource.Reload();
         this.connections = await ConnectionsResource.Reload();
         this.events = await EventsResource.Reload();
-        this.navdisplayoptions = await NavDisplayOptionsResource.Reload();
+        this.capabilities.navigator_display_option = await NavDisplayOptionsResource.Reload();
         this.proxies = await ProxiesResource.Reload();
     }
 
@@ -213,16 +212,15 @@ export class Driver {
             })
         }
 
-        if (Object.keys(this.capabilities).length == 0) {
+        if (Object.keys(this.capabilities).length > 0) {
             var nCapabilities = root.ele("capabilities");
 
             Object.keys(this.capabilities).forEach((key) => {
                 let value = this.capabilities[key]
 
                 if (key == "navigator_display_option") {
-/*                     value.forEach((option : C4NavigatorDisplayOption) => {
-                        nCapabilities.import(option.toXml())
-                    }); */
+                    let dOptions = new C4NavigatorDisplayOption(value, this.filename, true);
+                    nCapabilities.import(dOptions.toXml());
                 } else if (key == "web_view_url") {
                     value.forEach((url : C4WebviewUrl) => {
                         nCapabilities.import(url.toXml())
@@ -249,11 +247,6 @@ export class Driver {
                     nCapabilities.ele(key).txt(this.capabilities[key]);
                 }
             })
-        } else if (this.navdisplayoptions.length > 0) {
-            var nCapabilities = root.ele("capabilities");
-            let dOptions = new C4NavigatorDisplayOption(this.navdisplayoptions, this.filename, true);
-            nCapabilities.import(dOptions.toXml())
-
         }
 
         if (this.notification_attachment_provider == true) {
@@ -419,7 +412,7 @@ export class Driver {
                         return new C4Tab(tab)
                     })
                 }
-                
+ 
                 if (driver.capabilities) {
                     if (driver.capabilities.web_view_url) {
                         driver.capabilities.web_view_url = driver.capabilities.web_view_url.map((url) => {
@@ -521,20 +514,9 @@ export class Driver {
                 try {
                     let value: any = devicedata.capabilities[key];
 
-                // TODO - Implement import from XML
                     if (key == "navigator_display_option") {
-                        if (!d.capabilities[key]) {
-                            d.capabilities[key] = [];
-                        }
-                    let c4navdisplayoptions = C4NavigatorDisplayOption.fromXml(value);
-                    d.navdisplayoptions = C4NavDisplayOption.toInterface(c4navdisplayoptions);
-/*                     const navdisplayoptions = this.CleanXmlArray(devicedata.capabilities.navigator_display_option, "navigator_display_option")
-    
-                    if (navdisplayoptions) {
-                        navdisplayoptions.forEach(function (i) {
-                                d.navdisplayoptions.push(C4NavDisplayOption.fromXml(i))
-                        })
-                    } */
+                        let c4navdisplayoptions = C4NavigatorDisplayOption.fromXml(value);
+                        d.capabilities.navigator_display_option = C4NavDisplayOption.toInterface(c4navdisplayoptions);
                     } else if (key == "web_view_url") {
                         if (!d.capabilities[key]) {
                             d.capabilities[key] = [];
