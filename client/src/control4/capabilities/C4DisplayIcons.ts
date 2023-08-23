@@ -69,8 +69,8 @@ export class C4DisplayIcons {
         let option = new C4DisplayIcons();
             option.states = {}
 
-        let defaults = Driver.CleanXmlArray(value.display_icons, "Icon")
-        let states = Driver.CleanXmlArray(value.display_icons, "state")
+        let defaults = value.display_icons.Icon ? Driver.CleanXmlArray(value.display_icons, "Icon") : [];
+        let states = value.display_icons.state ? Driver.CleanXmlArray(value.display_icons, "state") : [];
 
         option.defaults = defaults.map((d) => {           
             return C4InterfaceIcon.fromXml(d)
