@@ -20,6 +20,7 @@ import EventsResource from '../components/events';
 import PropertiesResource from '../components/properties';
 import NavDisplayOptionsResource from '../components/navdisplayoptions';
 import ProxiesResource from '../components/proxies';
+import UIResource from '../components/ui';
 
 import { TypedJSON } from 'typedjson';
 import { C4UI } from '.';
@@ -148,6 +149,7 @@ export class Driver {
         this.events = await EventsResource.Reload();
         this.navdisplayoptions = await NavDisplayOptionsResource.Reload();
         this.proxies = await ProxiesResource.Reload();
+        this.UI = await UIResource.Reload();
     }
 
     /**
@@ -250,6 +252,10 @@ export class Driver {
                     nCapabilities.ele(key).txt(this.capabilities[key]);
                 }
             })
+
+            if (this.UI.length > 0) {
+                this.UI.forEach((u) => { nCapabilities.import(u.toXml()) });
+            }
         } else if (this.navdisplayoptions.length > 0) {
             var nCapabilities = root.ele("capabilities");
             let dOptions = new C4NavigatorDisplayOption(this.navdisplayoptions, this.filename, true);

@@ -33,14 +33,22 @@ export class C4UI {
     tabCommand: C4InterfaceCommand
 
     toXml() {
-        let node = builder.create("icons").root();
+        let node = builder.create("UI").root();
+        node.att("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
         for (const key in this) {
-            if (key == "icons") {
-                let icons = node.ele("Icons");
-
+            if (key == "proxy") {
+                node.att("proxybindingid", this.proxy.toString());
+            }
+            else if (key == "deviceIcon") {
+                node.ele("DeviceIcon").txt(this.deviceIcon);
+            }
+            else if (key == "brandingIcon") {
+                node.ele("BrandingIcon").txt(this.brandingIcon);
+            }
+            else if (key == "icons") {
                 this.icons.forEach(i => {
-                    icons.import(i.toXml())
+                    node.import(i.toXml())
                 });
             }
             else if (key == "screens") {
@@ -54,7 +62,7 @@ export class C4UI {
                 if (this.tabCommand) {
                     node.import(this.tabCommand.toXml());
                 } else if (this.tabs) {
-                    let tabs = node.ele("Tab");
+                    let tabs = node.ele("Tabs");
 
                     this.tabs.forEach(i => {
                         tabs.import(i.toXml())
@@ -77,16 +85,16 @@ export class C4UI {
         ui.brandingIcon = obj.BrandingIcon;
         ui.proxy = asInt(obj["@proxybindingid"]);
 
-        ui.icons = obj.Icons.IconGroup.map(function (i) {
+        ui.icons = [].concat(obj.Icons.IconGroup).map(function (i) {
             return C4InterfaceIcons.fromXml(i)
         })
 
-        ui.screens = obj.Screens.Screen.map(function (s) {
+        ui.screens = [].concat(obj.Screens.Screen).map(function (s) {
             return C4InterfaceScreen.fromXml(s)
         })
 
         if (obj.Tabs && obj.Tabs.Tab) {
-            ui.tabs = obj.Tabs.IconGroup.map(function (t) {
+            ui.tabs = [].concat(obj.Tabs.Tab).map(function (t) {
                 return C4InterfaceTab.fromXml(t)
             })
         } else if (obj.Tabs && obj.Tabs.Command) {

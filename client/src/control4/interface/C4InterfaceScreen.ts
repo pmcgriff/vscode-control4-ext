@@ -58,14 +58,14 @@ export default class C4InterfaceScreen {
         i.type = obj["@type"] || obj["@xsi:type"];
         i.id = obj["Id"];
         i.dataCommand = C4InterfaceDataCommand.fromXml(obj.DataCommand);
-        i.paginationStyle = obj["PaginationStyle"];
+        i.paginationStyle = obj["PaginationStyle"] ? obj["RequiresRefresh"] : undefined;
         i.requiresRefresh = asBoolean(obj["RequiresRefresh"]);
         i.titleProperty = obj["TitleProperty"];
         i.subtitleProperty = obj["SubtitleProperty"];
         i.imageProperty = obj["ImageProperty"];
         i.lengthProperty = obj["LengthProperty"];
         i.actionIdsProperty = obj["ActionIdsProperty"];
-        i.list = C4InterfaceList.fromXml(obj.List);
+        i.list = obj.List ? C4InterfaceList.fromXml(obj.List) : undefined;
 
         return i
     }

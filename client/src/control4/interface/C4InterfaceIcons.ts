@@ -20,15 +20,16 @@ export default class C4InterfaceIcons {
 
     toXml() {
         let node = builder.create("Icons").root();
-
+        
         for (const key in this) {
             if (key == "icons") {
                 let icons = node.ele("IconGroup");
+                icons.att("id", this.id.toString());
 
                 this.icons.forEach(i => {
                     icons.import(i.toXml())
                 });
-            } else {
+            } else if (key != "id") {
                 //@ts-ignore
                 node.ele(key).txt(this[key]);
             }
